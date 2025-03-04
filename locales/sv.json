@@ -1,0 +1,21 @@
+{
+    "menu_title": "Bevisförråd",
+    "create_stash": "Skapa nytt fack",
+    "create_stash_desc": "Skapa ett nytt bevisfack för en gripen person",
+    "search_stash": "Sök upp ett fack",
+    "search_stash_desc": "Sök efter ett bevisfack med namn",
+    "list_stashes": "Visa alla fack",
+    "list_stashes_desc": "Visa en lista över alla fack",
+    "open_stash": "Öppna bevisförråd",
+    "open_stash_desc": "Öppna förrådet för",
+    "input_stash_name": "Ange namn på den gripna",
+    "stash_created": "Fack skapades för",
+    "stash_exists": "Fack med det namnet finns redan!",
+    "stash_not_found": "Inget fack hittades med namnet",
+    "no_stashes": "Det finns inga registrerade fack!",
+    "no_access": "Du har inte behörighet att använda detta!",
+    "stash_wait": "Du måste vänta innan du skapar ett nytt fack!",
+    "invalid_stash_name": "Ogiltigt namn på facket!",
+    "select_stash": "Välj ett fack",
+    "select_stash_desc": "Välj ett förråd att öppna"
+}

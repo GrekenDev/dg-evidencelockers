@@ -1,0 +1,21 @@
+{
+    "menu_title": "Evidence Lockers",
+    "create_stash": "Create New Locker",
+    "create_stash_desc": "Create a new evidence locker for an arrested person",
+    "search_stash": "Search for a Locker",
+    "search_stash_desc": "Search for an evidence locker by name",
+    "list_stashes": "Show All Lockers",
+    "list_stashes_desc": "Display a list of all created lockers",
+    "open_stash": "Open Evidence Locker",
+    "open_stash_desc": "Open the locker for",
+    "input_stash_name": "Enter the name of the arrested person",
+    "stash_created": "Locker created for",
+    "stash_exists": "A locker with that name already exists!",
+    "stash_not_found": "No locker found with the name",
+    "no_stashes": "There are no registered lockers!",
+    "no_access": "You do not have permission to use this!",
+    "stash_wait": "You must wait before creating a new locker!",
+    "invalid_stash_name": "Invalid locker name!",
+    "select_stash": "Select a Locker",
+    "select_stash_desc": "Choose a locker to open"
+}
