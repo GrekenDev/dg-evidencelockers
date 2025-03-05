@@ -17,5 +17,11 @@
     "stash_wait": "Du måste vänta innan du skapar ett nytt fack!",
     "invalid_stash_name": "Ogiltigt namn på facket!",
     "select_stash": "Välj ett fack",
-    "select_stash_desc": "Välj ett förråd att öppna"
+    "select_stash_desc": "Välj ett förråd att öppna",
+    "clear_stash": "Töm fack",
+    "clear_stash_desc": "Välj ett fack att tömma",
+    "confirm_clear_stash": "Du håller på att tömma ett fack. Är du säker på att du vill göra detta?",
+    "stash_cleared": "Facket har tömts!",
+    "cancel": "Avbryt",
+    "confirm": "Bekräfta"
 }

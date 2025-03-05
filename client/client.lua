@@ -34,6 +34,14 @@ local function openContextMenu()
         onSelect = function()
           TriggerServerEvent('dg_evidencelocker:showAll')
         end
+      },
+      {
+        title = locale('clear_stash'),
+        description = locale('clear_stash_desc'),
+        icon = 'fa-solid fa-trash',
+        onSelect = function()
+          TriggerServerEvent('dg_evidencelocker:clearMenu')
+        end
       }
     }
   })
@@ -63,27 +71,94 @@ AddEventHandler('dg_evidencelocker:openMenu', function(lockers)
   lib.showContext('dg_evidencelocker_list')
 end)
 
+RegisterNetEvent('dg_evidencelocker:openClearMenu')
+AddEventHandler('dg_evidencelocker:openClearMenu', function(lockers)
+  local options = {}
+
+  for _, locker in ipairs(lockers) do
+    table.insert(options, {
+      title = locker.name,
+      description = locale('clear_stash_desc') .. ' ' .. locker.name,
+      icon = 'fa-solid fa-trash',
+      onSelect = function()
+        TriggerServerEvent('dg_evidencelocker:confirmClear', locker.stash_name)
+      end
+    })
+  end
+
+  lib.registerContext({
+    id = 'dg_evidencelocker_clear',
+    title = locale('clear_stash'),
+    options = options
+  })
+  lib.showContext('dg_evidencelocker_clear')
+end)
+
+RegisterNetEvent('dg_evidencelocker:confirmClear')
+AddEventHandler('dg_evidencelocker:confirmClear', function(stashName)
+  local confirmed = lib.alertDialog({
+    header = locale('clear_stash'),
+    content = locale('confirm_clear_stash'),
+    centered = true,
+    cancel = true,
+    size = 'md',
+    labels = { cancel = locale('cancel'), confirm = locale('confirm') }
+  })
+
+  if confirmed == 'confirm' then
+    TriggerServerEvent('dg_evidencelocker:clear', stashName)
+  end
+end)
+
 local function getPlayerJob()
   local player = exports.qbx_core:GetPlayerData()
   return player and player.job and player.job.name or nil
 end
 
-exports.ox_target:addBoxZone({
-  coords = Config.StashLocation,
-  size = vec3(1, 1, 1),
-  rotation = 0,
-  debug = false,
-  options = {
-    {
-      label = locale('open_stash'),
-      icon = 'fa-solid fa-archive',
-      action = function()
-        openContextMenu()
-      end,
-      canInteract = function(entity, distance, data)
-        local job = getPlayerJob()
-        return job and Config.AllowedJobs[job] ~= nil
-      end
+local stashZone = nil
+
+local function createStashZone()
+  if stashZone then return end
+
+  stashZone = exports.ox_target:addBoxZone({
+    coords = Config.StashLocation,
+    size = vec3(1, 1, 1),
+    rotation = 0,
+    debug = false,
+    options = {
+      {
+        label = locale('open_stash'),
+        icon = 'fa-solid fa-archive',
+        onSelect = function()
+          openContextMenu()
+        end,
+        canInteract = function()
+          local job = getPlayerJob()
+          return job and Config.AllowedJobs[job] ~= nil
+        end
+      }
     }
-  }
-})
+  })
+end
+
+local function removeStashZone()
+  if stashZone then
+    exports.ox_target:removeZone(stashZone)
+    stashZone = nil
+  end
+end
+
+CreateThread(function()
+  while true do
+    local playerCoords = GetEntityCoords(PlayerPedId())
+    local distance = #(playerCoords - Config.StashLocation)
+
+    if distance < 50 then
+      createStashZone()
+    else
+      removeStashZone()
+    end
+
+    Wait(5000)
+  end
+end)
