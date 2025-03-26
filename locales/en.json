@@ -20,8 +20,13 @@
     "select_stash_desc": "Choose a locker to open",
     "clear_stash": "Clear Locker",
     "clear_stash_desc": "Select a locker to clear",
+    "delete_stash": "Delete locker",
+    "delete_stash_desc": "Choose a locker to delete",
     "confirm_clear_stash": "You are about to clear a locker. Are you sure you want to do this?",
     "stash_cleared": "The locker has been cleared!",
+    "confirm_delete_stash": "You are about to delete a locker. Are you sure you want to proceed?",
+    "stash_deleted": "The locker has been deleted!",
+    "stash_deleted_failed": "Failed to delete the locker. Please try again or check permissions.",
     "cancel": "Cancel",
     "confirm": "Confirm"
 }

@@ -42,7 +42,15 @@ local function openContextMenu()
         onSelect = function()
           TriggerServerEvent('dg_evidencelocker:clearMenu')
         end
-      }
+      },
+      {
+        title = locale('delete_stash'),
+        description = locale('delete_stash_desc'),
+        icon = 'fa-solid fa-triangle-exclamation',
+        onSelect = function()
+          TriggerServerEvent('dg_evidencelocker:deleteMenu')
+        end
+      }      
     }
   })
   lib.showContext('dg_evidencelocker_menu')
@@ -107,6 +115,45 @@ AddEventHandler('dg_evidencelocker:confirmClear', function(stashName)
 
   if confirmed == 'confirm' then
     TriggerServerEvent('dg_evidencelocker:clear', stashName)
+  end
+end)
+
+RegisterNetEvent('dg_evidencelocker:openDeleteMenu')
+AddEventHandler('dg_evidencelocker:openDeleteMenu', function(lockers)
+  local options = {}
+
+  for _, locker in ipairs(lockers) do
+    table.insert(options, {
+      title = locker.name,
+      description = locale('delete_stash_desc') .. ' ' .. locker.name,
+      icon = 'fa-solid fa-triangle-exclamation',
+      onSelect = function()
+        TriggerServerEvent('dg_evidencelocker:confirmDelete', locker.stash_name)
+      end
+    })
+  end
+
+  lib.registerContext({
+    id = 'dg_evidencelocker_delete',
+    title = locale('delete_stash'),
+    options = options
+  })
+  lib.showContext('dg_evidencelocker_delete')
+end)
+
+RegisterNetEvent('dg_evidencelocker:confirmDelete')
+AddEventHandler('dg_evidencelocker:confirmDelete', function(stashName)
+  local confirmed = lib.alertDialog({
+    header = locale('delete_stash'),
+    content = locale('confirm_delete_stash'),
+    centered = true,
+    cancel = true,
+    size = 'md',
+    labels = { cancel = locale('cancel'), confirm = locale('confirm') }
+  })
+
+  if confirmed == 'confirm' then
+    TriggerServerEvent('dg_evidencelocker:delete', stashName)
   end
 end)
 

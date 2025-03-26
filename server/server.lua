@@ -134,7 +134,7 @@ AddEventHandler('dg_evidencelocker:confirmClear', function(stashName)
     return
   end
 
-  -- Skicka bekräftelse till klienten
+
   TriggerClientEvent('dg_evidencelocker:confirmClear', src, stashName)
 end)
 
@@ -150,4 +150,56 @@ AddEventHandler('dg_evidencelocker:clear', function(stashName)
 
   exports.ox_inventory:ClearInventory(stashName)
   TriggerClientEvent('ox_lib:notify', src, { type = 'success', description = locale('stash_cleared') })
+end)
+
+RegisterNetEvent('dg_evidencelocker:deleteMenu')
+AddEventHandler('dg_evidencelocker:deleteMenu', function()
+  local src = source
+  local jobName = getPlayerJob(src)
+
+  if not jobName or not Config.AllowedJobs[jobName] then
+    TriggerClientEvent('ox_lib:notify', src, { type = 'error', description = locale('no_access') })
+    return
+  end
+
+  MySQL.query('SELECT name, stash_name FROM police_lockers', {}, function(results)
+    if #results > 0 then
+      TriggerClientEvent('dg_evidencelocker:openDeleteMenu', src, results)
+    else
+      TriggerClientEvent('ox_lib:notify', src, { type = 'info', description = locale('no_stashes') })
+    end
+  end)
+end)
+
+RegisterNetEvent('dg_evidencelocker:confirmDelete')
+AddEventHandler('dg_evidencelocker:confirmDelete', function(stashName)
+  local src = source
+  local jobName = getPlayerJob(src)
+
+  if not jobName or not Config.AllowedJobs[jobName] then
+    TriggerClientEvent('ox_lib:notify', src, { type = 'error', description = locale('no_access') })
+    return
+  end
+
+  TriggerClientEvent('dg_evidencelocker:confirmDelete', src, stashName)
+end)
+
+RegisterNetEvent('dg_evidencelocker:delete')
+AddEventHandler('dg_evidencelocker:delete', function(stashName)
+  local src = source
+  local jobName = getPlayerJob(src)
+
+  if not jobName or not Config.AllowedJobs[jobName] then
+    TriggerClientEvent('ox_lib:notify', src, { type = 'error', description = locale('no_access') })
+    return
+  end
+
+  MySQL.update('DELETE FROM police_lockers WHERE stash_name = ?', { stashName }, function(affected)
+    if affected > 0 then
+      exports.ox_inventory:ClearInventory(stashName) -- Only clear inventory if deletion is successful
+      TriggerClientEvent('ox_lib:notify', src, { type = 'success', description = locale('stash_deleted') })
+    else
+      TriggerClientEvent('ox_lib:notify', src, { type = 'error', description = locale('stash_deleted_failed') })
+    end
+  end)
 end)

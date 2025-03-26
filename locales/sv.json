@@ -22,6 +22,11 @@
     "clear_stash_desc": "Välj ett fack att tömma",
     "confirm_clear_stash": "Du håller på att tömma ett fack. Är du säker på att du vill göra detta?",
     "stash_cleared": "Facket har tömts!",
+    "confirm_delete_stash": "Du håller på att radera ett fack. Är du säker på att du vill fortsätta?",
+    "stash_deleted": "Facket har raderats!",
+    "stash_deleted_failed": "Misslyckades med att radera facket. Försök igen eller kontrollera behörighet.",
+    "delete_stash": "Ta bort fack",
+    "delete_stash_desc": "Välj ett fack att ta bort",
     "cancel": "Avbryt",
     "confirm": "Bekräfta"
 }
