@@ -27,6 +27,7 @@
     "confirm_delete_stash": "You are about to delete a locker. Are you sure you want to proceed?",
     "stash_deleted": "The locker has been deleted!",
     "stash_deleted_failed": "Failed to delete the locker. Please try again or check permissions.",
+    "back": "Back",
     "cancel": "Cancel",
     "confirm": "Confirm"
 }

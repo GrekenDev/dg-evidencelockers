@@ -50,15 +50,20 @@ local function openContextMenu()
         onSelect = function()
           TriggerServerEvent('dg_evidencelocker:deleteMenu')
         end
-      }      
+      }
     }
   })
   lib.showContext('dg_evidencelocker_menu')
 end
 
-RegisterNetEvent('dg_evidencelocker:openMenu')
-AddEventHandler('dg_evidencelocker:openMenu', function(lockers)
-  local options = {}
+RegisterNetEvent('dg_evidencelocker:openMenu', function(lockers)
+  local options = {
+    {
+      title = locale('back'),
+      icon = 'fa-solid fa-arrow-left',
+      onSelect = openContextMenu
+    }
+  }
 
   for _, locker in ipairs(lockers) do
     table.insert(options, {
@@ -79,9 +84,14 @@ AddEventHandler('dg_evidencelocker:openMenu', function(lockers)
   lib.showContext('dg_evidencelocker_list')
 end)
 
-RegisterNetEvent('dg_evidencelocker:openClearMenu')
-AddEventHandler('dg_evidencelocker:openClearMenu', function(lockers)
-  local options = {}
+RegisterNetEvent('dg_evidencelocker:openClearMenu', function(lockers)
+  local options = {
+    {
+      title = locale('back'),
+      icon = 'fa-solid fa-arrow-left',
+      onSelect = openContextMenu
+    }
+  }
 
   for _, locker in ipairs(lockers) do
     table.insert(options, {
@@ -102,8 +112,7 @@ AddEventHandler('dg_evidencelocker:openClearMenu', function(lockers)
   lib.showContext('dg_evidencelocker_clear')
 end)
 
-RegisterNetEvent('dg_evidencelocker:confirmClear')
-AddEventHandler('dg_evidencelocker:confirmClear', function(stashName)
+RegisterNetEvent('dg_evidencelocker:confirmClear', function(stashName)
   local confirmed = lib.alertDialog({
     header = locale('clear_stash'),
     content = locale('confirm_clear_stash'),
@@ -118,9 +127,14 @@ AddEventHandler('dg_evidencelocker:confirmClear', function(stashName)
   end
 end)
 
-RegisterNetEvent('dg_evidencelocker:openDeleteMenu')
-AddEventHandler('dg_evidencelocker:openDeleteMenu', function(lockers)
-  local options = {}
+RegisterNetEvent('dg_evidencelocker:openDeleteMenu', function(lockers)
+  local options = {
+    {
+      title = locale('back'),
+      icon = 'fa-solid fa-arrow-left',
+      onSelect = openContextMenu
+    }
+  }
 
   for _, locker in ipairs(lockers) do
     table.insert(options, {
@@ -141,8 +155,7 @@ AddEventHandler('dg_evidencelocker:openDeleteMenu', function(lockers)
   lib.showContext('dg_evidencelocker_delete')
 end)
 
-RegisterNetEvent('dg_evidencelocker:confirmDelete')
-AddEventHandler('dg_evidencelocker:confirmDelete', function(stashName)
+RegisterNetEvent('dg_evidencelocker:confirmDelete', function(stashName)
   local confirmed = lib.alertDialog({
     header = locale('delete_stash'),
     content = locale('confirm_delete_stash'),
@@ -176,9 +189,7 @@ local function createStashZone()
       {
         label = locale('open_stash'),
         icon = 'fa-solid fa-archive',
-        onSelect = function()
-          openContextMenu()
-        end,
+        onSelect = openContextMenu,
         canInteract = function()
           local job = getPlayerJob()
           return job and Config.AllowedJobs[job] ~= nil

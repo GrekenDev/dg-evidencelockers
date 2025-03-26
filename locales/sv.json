@@ -27,6 +27,7 @@
     "stash_deleted_failed": "Misslyckades med att radera facket. Försök igen eller kontrollera behörighet.",
     "delete_stash": "Ta bort fack",
     "delete_stash_desc": "Välj ett fack att ta bort",
+    "back": "Tillbaka",
     "cancel": "Avbryt",
     "confirm": "Bekräfta"
 }
