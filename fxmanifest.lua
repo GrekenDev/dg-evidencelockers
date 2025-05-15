@@ -5,7 +5,7 @@ lua54 'yes'
 
 author 'Greken!'
 description 'Job-based stash system using ox_lib, ox_inventory, qbx_core, and ox_target'
-version '1.0.2'
+version '1.0.3'
 
 shared_script {
   '@ox_lib/init.lua',

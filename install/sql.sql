@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS police_lockers (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
-    stash_name VARCHAR(255) NOT NULL UNIQUE
+    stash_name VARCHAR(255) NOT NULL UNIQUE,
+    locker VARCHAR(50) NOT NULL
 );
