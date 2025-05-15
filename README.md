@@ -8,7 +8,7 @@
 - 🔍 Search for an existing locker and access stored items.
 - 📜 View all created lockers and select which one to open.
 - 🎯 Secure system with job-based restrictions.
-- 🔥 Optimized **ox_target** zone handling for better performance.
+- 🔥 Optimized **ox_target** & **sleepless_intercat** zone handling for better performance.
 - 🌍 Multi-language support (English & Swedish included).
 
 ## 📂 Installation
