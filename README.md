@@ -18,10 +18,11 @@
 3. Run the SQL
 
    - [ox_inventory](https://overextended.dev/ox_inventory/)
-   - [ox_lib](https://overextended.dev/ox_lib/)
+   - [ox_lib](https://overextended.dev/ox_lib/) ---Optional
    - [ox_target](https://overextended.dev/ox_target/)
    - [qbx_core](https://docs.qbox.re/)
    - [oxmysql](https://overextended.dev/oxmysql/)
+   - [sleepless](https://github.com/Sleepless-Development/sleepless_interact) --- Optional
 
 4. Add the resource to your **server.cfg**:
    ```ini
