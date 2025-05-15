@@ -4,8 +4,8 @@ game 'gta5'
 lua54 'yes'
 
 author 'Greken!'
-description 'Job-based stash system using ox_lib, ox_inventory, qbx_core, and ox_target'
-version '1.0.3'
+description 'Job-based stash system using ox_lib, ox_inventory, qbx_core, and ox_target/sleepless_interact'
+version '1.0.4'
 
 shared_script {
   '@ox_lib/init.lua',
@@ -30,5 +30,5 @@ dependencies {
   'ox_inventory',
   'qbx_core',
   'ox_target',
-  'oxmysql'
+  'oxmysql',
 }
