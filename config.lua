@@ -1,5 +1,7 @@
 Config = {}
 
+Config.Interact = "sleepless" -- ox_target or sleepless
+
 Config.EvidenceLockers = {
   ["VinewoodPoliceDep"] = {
     coords = vector3(605.60, 7.80, 75.04),

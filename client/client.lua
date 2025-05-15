@@ -193,36 +193,69 @@ local stashZones = {}
 local function createStashZones()
   for name, locker in pairs(Config.EvidenceLockers) do
     if not stashZones[name] then
-      stashZones[name] = exports.ox_target:addBoxZone({
-        coords = locker.coords,
-        size = vec3(1, 1, 1),
-        rotation = 0,
-        debug = false,
-        options = {
-          {
-            label = locale('open_stash'),
-            icon = 'fa-solid fa-archive',
-            onSelect = function()
-              openContextMenu(name)
-            end,
-            canInteract = function()
-              local job = getPlayerJob()
-              if not job or not hasJob(locker.jobs, job) then
-                lib.notify({ type = 'error', description = locale('no_access_job') })
-                return false
+      if Config.Interact == "ox_target" then
+        stashZones[name] = exports.ox_target:addBoxZone({
+          coords = locker.coords,
+          size = vec3(1, 1, 1),
+          rotation = 0,
+          debug = false,
+          options = {
+            {
+              label = locale('open_stash'),
+              icon = 'fa-solid fa-archive',
+              onSelect = function()
+                openContextMenu(name)
+              end,
+              canInteract = function()
+                local job = getPlayerJob()
+                if not job or not hasJob(locker.jobs, job) then
+                  lib.notify({ type = 'error', description = locale('no_access_job') })
+                  return false
+                end
+                return true
               end
-              return true
-            end
+            }
           }
-        }
-      })
+        })
+      elseif Config.Interact == "sleepless" then
+        stashZones[name] = exports['sleepless_interact']:addCoords({
+          coords = locker.coords,
+          length = 1.0,
+          width = 1.0,
+          heading = 0.0,
+          minZ = locker.coords.z - 1.0,
+          maxZ = locker.coords.z + 1.0,
+          debug = false,
+          options = {
+            {
+              label = locale('open_stash'),
+              icon = 'fa-solid fa-archive',
+              action = function()
+                openContextMenu(name)
+              end,
+              canInteract = function()
+                local job = getPlayerJob()
+                if not job or not hasJob(locker.jobs, job) then
+                  lib.notify({ type = 'error', description = locale('no_access_job') })
+                  return false
+                end
+                return true
+              end
+            }
+          }
+        })
+      end
     end
   end
 end
 
 local function removeStashZones()
   for name, zone in pairs(stashZones) do
-    exports.ox_target:removeZone(zone)
+    if Config.Interact == "ox_target" then
+      exports.ox_target:removeZone(zone)
+    elseif Config.Interact == "sleepless_interact" then
+      exports['sleepless_interact']:removeCoords(zone)
+    end
     stashZones[name] = nil
   end
 end
