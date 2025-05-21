@@ -1,6 +1,6 @@
 lib.locale()
 
-local currentVersion = '1.0.4'
+local currentVersion = '1.0.5'
 local versionURL = 'https://raw.githubusercontent.com/GrekenDev/dg-evidencelockers/main/version.txt'
 
 CreateThread(function()
