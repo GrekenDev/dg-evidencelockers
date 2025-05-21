@@ -5,7 +5,7 @@ lua54 'yes'
 
 author 'Greken!'
 description 'Job-based stash system using ox_lib, ox_inventory, qbx_core, and ox_target/sleepless_interact'
-version '1.0.5'
+version '1.0.6'
 
 shared_script {
   '@ox_lib/init.lua',
@@ -18,6 +18,7 @@ files {
 
 client_scripts {
   'client/*.lua',
+  '@sleepless_interact/init.lua',
 }
 
 server_scripts {

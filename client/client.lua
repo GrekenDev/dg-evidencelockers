@@ -214,28 +214,21 @@ local function createStashZones()
           }
         })
       elseif Config.Interact == "sleepless" or Config.Interact == "sleepless_interact" then
-        stashZones[name] = exports['sleepless_interact']:addCoords({
-          coords = locker.coords,
-          length = 1.0,
-          width = 1.0,
-          heading = 0.0,
-          minZ = locker.coords.z - 1.0,
-          maxZ = locker.coords.z + 1.0,
-          debug = false,
-          options = {
-            {
-              label = locale('open_stash'),
-              icon = 'fa-solid fa-archive',
-              action = function()
-                openContextMenu(name)
-              end,
-              canInteract = function()
-                local job = getPlayerJob()
-                return job and hasJob(locker.jobs, job)
-              end
-            }
+        stashZones[name] = exports['sleepless_interact']:addCoords(
+          locker.coords,
+          {
+            label = locale('open_stash'),
+            icon = 'fa-solid fa-archive',
+            distance = 2.0,
+            onSelect = function(data)
+              openContextMenu(name)
+            end,
+            canInteract = function(entity, distance, coords, zoneName)
+              local job = getPlayerJob()
+              return job and type(locker.jobs) == "table" and hasJob(locker.jobs, job)
+            end
           }
-        })
+        )
       end
     end
   end
