@@ -208,16 +208,12 @@ local function createStashZones()
               end,
               canInteract = function()
                 local job = getPlayerJob()
-                if not job or not hasJob(locker.jobs, job) then
-                  lib.notify({ type = 'error', description = locale('no_access_job') })
-                  return false
-                end
-                return true
+                return job and hasJob(locker.jobs, job)
               end
             }
           }
         })
-      elseif Config.Interact == "sleepless" then
+      elseif Config.Interact == "sleepless" or Config.Interact == "sleepless_interact" then
         stashZones[name] = exports['sleepless_interact']:addCoords({
           coords = locker.coords,
           length = 1.0,
@@ -235,11 +231,7 @@ local function createStashZones()
               end,
               canInteract = function()
                 local job = getPlayerJob()
-                if not job or not hasJob(locker.jobs, job) then
-                  lib.notify({ type = 'error', description = locale('no_access_job') })
-                  return false
-                end
-                return true
+                return job and hasJob(locker.jobs, job)
               end
             }
           }
@@ -253,7 +245,7 @@ local function removeStashZones()
   for name, zone in pairs(stashZones) do
     if Config.Interact == "ox_target" then
       exports.ox_target:removeZone(zone)
-    elseif Config.Interact == "sleepless_interact" then
+    elseif Config.Interact == "sleepless" then
       exports['sleepless_interact']:removeCoords(zone)
     end
     stashZones[name] = nil
