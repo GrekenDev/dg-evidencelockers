@@ -18,11 +18,13 @@ end
 CreateThread(function()
     local currentVersion = GetResourceMetadata(GetCurrentResourceName(), 'version', 0)
     local repo = 'GrekenDev/dg-evidencelockers'
+    print('^2[DG-EvidenceLockers] Checking version: Current = ' .. (currentVersion or 'nil') .. '^0')
     lib.checkDependency(repo, currentVersion, function(data)
         if not data then
             print('^1[DG-EvidenceLockers] Version check failed. Could not reach version server.^0')
             return
         end
+        print('^2[DG-EvidenceLockers] Version data received: ' .. json.encode(data) .. '^0')
         local latestVersion = data.version
         if latestVersion ~= currentVersion then
             print('^3[DG-EvidenceLockers] A new version is available: ^2' .. latestVersion .. '^3 (You are running: ^1' .. currentVersion .. '^3)')
@@ -31,6 +33,7 @@ CreateThread(function()
             print('^2[DG-EvidenceLockers] You are running the latest version (' .. currentVersion .. ').^0')
         end
     end)
+    Wait(0)
 end)
 
 AddEventHandler('onResourceStart', function(resourceName)
