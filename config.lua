@@ -1,6 +1,12 @@
 Config = {}
 
 Config.Interact = "sleepless" -- ox_target or sleepless
+Config.Notify = "ox" -- ox for ox_lib, okok for okok_notify,
+Config.NotifyTitle = "Evidence Locker" -- Title for notifications
+Config.NotifyIcon = "fa-solid fa-archive" -- -- notify icon https://fontawesome.com/search?ic=free
+Config.NotifyPosition = "center-right" -- top, bottom, left, right
+Config.NotifyDuration = 5000 -- in milliseconds
+
 
 Config.EvidenceLockers = {
   ["VinewoodPoliceDep"] = {
