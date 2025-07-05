@@ -12,9 +12,88 @@ local function Notify(data)
         })
     elseif Config.Notify == "okok" then
         exports['okokNotify']:Alert(data.title or Config.NotifyTitle or 'Evidence Locker', data.description, Config.NotifyDuration, data.type or 'info')
+    elseif Config.Notify == "lation" then
+        exports.lation_ui:notify({
+            title = data.title or Config.NotifyTitle or 'Evidence Locker',
+            message = data.description or '',
+            type = data.type or 'info',
+            icon = data.icon,
+            iconColor = data.iconColor,
+            bgColor = data.bgColor,
+            txtColor = data.txtColor
+        })
     end
 end
 
+-- Wrappers for Ox or Lation UI
+local function AlertDialog(data)
+    if Config.UseLationUi then
+        return exports.lation_ui:alert({
+            header = data.header,
+            content = data.content,
+            icon = data.icon or 'fas fa-circle-exclamation',
+            iconColor = '#EF4444',
+            type = 'destructive',
+            labels = {
+                cancel = locale('cancel'),
+                confirm = locale('confirm')
+            }
+        })
+    else
+        return lib.alertDialog({
+            header = data.header,
+            content = data.content,
+            centered = true,
+            cancel = true,
+            size = 'md',
+            labels = {
+                cancel = locale('cancel'),
+                confirm = locale('confirm')
+            }
+        })
+    end
+end
+
+local function InputDialog(title, label)
+    if Config.UseLationUi then
+        local result = exports.lation_ui:input({
+            title = title,
+            subtitle = label,
+            submitText = locale('submitText') or "Bekräfta",
+            options = {
+                {
+                    type = 'input',
+                    label = label,
+                    description = '',
+                    placeholder = '',
+                    icon = 'fas fa-pen',
+                    required = true
+                }
+            }
+        })
+        if result then return { result[1] } end
+    else
+        return lib.inputDialog(title, { label })
+    end
+end
+
+local function ShowContextMenu(id, title, description, options)
+    if Config.UseLationUi then
+        exports.lation_ui:registerMenu({
+            id = id,
+            title = title,
+            subtitle = description or '',
+            onExit = function() end,
+            options = options
+        })
+        exports.lation_ui:showMenu(id)
+    else
+        lib.registerContext({ id = id, title = title, description = description, options = options })
+        lib.showContext(id)
+    end
+end
+
+-- Job utilities
 local function getPlayerJob()
     local player = exports.qbx_core:GetPlayerData()
     return player and player.job and player.job.name or nil
@@ -27,72 +106,68 @@ local function hasJob(jobs, playerJob)
     return false
 end
 
+-- Main Menu
 local function openContextMenu(lockerName)
-    lib.registerContext({
-        id = 'dg_evidencelocker_menu_' .. lockerName,
-        title = locale('menu_title'),
-        options = {
-            {
-                title = locale('create_stash'),
-                description = locale('create_stash_desc'),
-                icon = 'fa-solid fa-folder-plus',
-                onSelect = function()
-                    local input = lib.inputDialog(locale('create_stash'), { locale('input_stash_name') })
-                    if input and input[1] then
-                        TriggerServerEvent('dg_evidencelocker:create', lockerName, input[1])
-                    end
+    ShowContextMenu('dg_evidencelocker_menu_' .. lockerName, locale('menu_title'), nil, {
+        {
+            title = locale('create_stash'),
+            description = locale('create_stash_desc'),
+            icon = 'fas fa-folder-plus',
+            onSelect = function()
+                local input = InputDialog(locale('create_stash'), locale('input_stash_name'))
+                if input and input[1] then
+                    TriggerServerEvent('dg_evidencelocker:create', lockerName, input[1])
                 end
-            },
-            {
-                title = locale('search_stash'),
-                description = locale('search_stash_desc'),
-                icon = 'fa-solid fa-search',
-                onSelect = function()
-                    local input = lib.inputDialog(locale('search_stash'), { locale('input_stash_name') })
-                    if input and input[1] then
-                        TriggerServerEvent('dg_evidencelocker:search', lockerName, input[1])
-                    end
+            end
+        },
+        {
+            title = locale('search_stash'),
+            description = locale('search_stash_desc'),
+            icon = 'fas fa-search',
+            onSelect = function()
+                local input = InputDialog(locale('search_stash'), locale('input_stash_name'))
+                if input and input[1] then
+                    TriggerServerEvent('dg_evidencelocker:search', lockerName, input[1])
                 end
-            },
-            {
-                title = locale('list_stashes'),
-                description = locale('list_stashes_desc'),
-                icon = 'fa-solid fa-list',
-                onSelect = function()
-                    TriggerServerEvent('dg_evidencelocker:showAll', lockerName)
-                end
-            },
-            {
-                title = locale('clear_stash'),
-                description = locale('clear_stash_desc'),
-                icon = 'fa-solid fa-trash',
-                onSelect = function()
-                    TriggerServerEvent('dg_evidencelocker:clearMenu', lockerName)
-                end
-            },
-            {
-                title = locale('delete_stash'),
-                description = locale('delete_stash_desc'),
-                icon = 'fa-solid fa-triangle-exclamation',
-                onSelect = function()
-                    TriggerServerEvent('dg_evidencelocker:deleteMenu', lockerName)
-                end
-            }
+            end
+        },
+        {
+            title = locale('list_stashes'),
+            description = locale('list_stashes_desc'),
+            icon = 'fas fa-list',
+            onSelect = function()
+                TriggerServerEvent('dg_evidencelocker:showAll', lockerName)
+            end
+        },
+        {
+            title = locale('clear_stash'),
+            description = locale('clear_stash_desc'),
+            icon = 'fas fa-trash',
+            onSelect = function()
+                TriggerServerEvent('dg_evidencelocker:clearMenu', lockerName)
+            end
+        },
+        {
+            title = locale('delete_stash'),
+            description = locale('delete_stash_desc'),
+            icon = 'fas fa-triangle-exclamation',
+            onSelect = function()
+                TriggerServerEvent('dg_evidencelocker:deleteMenu', lockerName)
+            end
         }
     })
-    lib.showContext('dg_evidencelocker_menu_' .. lockerName)
 end
 
-RegisterNetEvent('dg_evidencelocker:openMenu')
-AddEventHandler('dg_evidencelocker:openMenu', function(lockerName, lockers)
+-- All other menus use ShowContextMenu similarly
+-- openMenu
+RegisterNetEvent('dg_evidencelocker:openMenu', function(lockerName, lockers)
     local options = {
         {
             title = locale('back'),
-            icon = 'fa-solid fa-arrow-left',
+            icon = 'fas fa-arrow-left',
             onSelect = function() openContextMenu(lockerName) end
         }
     }
-
     for _, locker in ipairs(lockers) do
         table.insert(options, {
             title = locker.name,
@@ -102,101 +177,66 @@ AddEventHandler('dg_evidencelocker:openMenu', function(lockerName, lockers)
             end
         })
     end
-
-    lib.registerContext({
-        id = 'dg_evidencelocker_list_' .. lockerName,
-        title = locale('select_stash'),
-        description = locale('select_stash_desc'),
-        options = options
-    })
-    lib.showContext('dg_evidencelocker_list_' .. lockerName)
+    ShowContextMenu('dg_evidencelocker_list_' .. lockerName, locale('select_stash'), locale('select_stash_desc'), options)
 end)
 
-RegisterNetEvent('dg_evidencelocker:openClearMenu')
-AddEventHandler('dg_evidencelocker:openClearMenu', function(lockerName, lockers)
+RegisterNetEvent('dg_evidencelocker:openClearMenu', function(lockerName, lockers)
     local options = {
         {
             title = locale('back'),
-            icon = 'fa-solid fa-arrow-left',
+            icon = 'fas fa-arrow-left',
             onSelect = function() openContextMenu(lockerName) end
         }
     }
-
     for _, locker in ipairs(lockers) do
         table.insert(options, {
             title = locker.name,
             description = locale('clear_stash_desc') .. ' ' .. locker.name,
-            icon = 'fa-solid fa-trash',
+            icon = 'fas fa-trash',
             onSelect = function()
                 TriggerServerEvent('dg_evidencelocker:confirmClear', lockerName, locker.stash_name)
             end
         })
     end
-
-    lib.registerContext({
-        id = 'dg_evidencelocker_clear_' .. lockerName,
-        title = locale('clear_stash'),
-        options = options
-    })
-    lib.showContext('dg_evidencelocker_clear_' .. lockerName)
+    ShowContextMenu('dg_evidencelocker_clear_' .. lockerName, locale('clear_stash'), nil, options)
 end)
 
-RegisterNetEvent('dg_evidencelocker:confirmClear')
-AddEventHandler('dg_evidencelocker:confirmClear', function(lockerName, stashName)
-    local confirmed = lib.alertDialog({
+RegisterNetEvent('dg_evidencelocker:confirmClear', function(lockerName, stashName)
+    local confirmed = AlertDialog({
         header = locale('clear_stash'),
-        content = locale('confirm_clear_stash'),
-        centered = true,
-        cancel = true,
-        size = 'md',
-        labels = { cancel = locale('cancel'), confirm = locale('confirm') }
+        content = locale('confirm_clear_stash')
     })
-
     if confirmed == 'confirm' then
         TriggerServerEvent('dg_evidencelocker:clear', lockerName, stashName)
     end
 end)
 
-RegisterNetEvent('dg_evidencelocker:openDeleteMenu')
-AddEventHandler('dg_evidencelocker:openDeleteMenu', function(lockerName, lockers)
+RegisterNetEvent('dg_evidencelocker:openDeleteMenu', function(lockerName, lockers)
     local options = {
         {
             title = locale('back'),
-            icon = 'fa-solid fa-arrow-left',
+            icon = 'fas fa-arrow-left',
             onSelect = function() openContextMenu(lockerName) end
         }
     }
-
     for _, locker in ipairs(lockers) do
         table.insert(options, {
             title = locker.name,
             description = locale('delete_stash_desc') .. ' ' .. locker.name,
-            icon = 'fa-solid fa-triangle-exclamation',
+            icon = 'fas fa-triangle-exclamation',
             onSelect = function()
                 TriggerServerEvent('dg_evidencelocker:confirmDelete', lockerName, locker.stash_name)
             end
         })
     end
-
-    lib.registerContext({
-        id = 'dg_evidencelocker_delete_' .. lockerName,
-        title = locale('delete_stash'),
-        options = options
-    })
-    lib.showContext('dg_evidencelocker_delete_' .. lockerName)
+    ShowContextMenu('dg_evidencelocker_delete_' .. lockerName, locale('delete_stash'), nil, options)
 end)
 
-RegisterNetEvent('dg_evidencelocker:confirmDelete')
-AddEventHandler('dg_evidencelocker:confirmDelete', function(lockerName, stashName)
-    local confirmed = lib.alertDialog({
+RegisterNetEvent('dg_evidencelocker:confirmDelete', function(lockerName, stashName)
+    local confirmed = AlertDialog({
         header = locale('delete_stash'),
-        content = locale('confirm_delete_stash'),
-        centered = true,
-        cancel = true,
-        size = 'md',
-        labels = { cancel = locale('cancel'), confirm = locale('confirm') }
+        content = locale('confirm_delete_stash')
     })
-
     if confirmed == 'confirm' then
         TriggerServerEvent('dg_evidencelocker:delete', lockerName, stashName)
     end
@@ -298,4 +338,16 @@ CreateThread(function()
 
         Wait(5000)
     end
+end)
+
+RegisterNetEvent('dg_evidencelocker:clientNotify', function(data)
+    exports.lation_ui:notify({
+        title = data.title,
+        message = data.message,
+        type = data.type,
+        icon = data.icon,
+        iconColor = data.iconColor,
+        bgColor = data.bgColor,
+        txtColor = data.txtColor
+    })
 end)

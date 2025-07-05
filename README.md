@@ -1,32 +1,57 @@
 # dg-evidencelockers
 
-**dg-evidencelockers** is a FiveM evidence locker system designed for police forces using **qbx_core, ox_inventory, ox_lib, ox_target/sleepless_interact, and oxmysql**. It allows officers to create, search, and manage evidence lockers for arrested individuals.
+**dg-evidencelockers** is a FiveM evidence locker system designed for police departments using **qbx_core**, **ox_inventory**, **bb_inventory**, **ox_lib**, **oxmysql**, and either **ox_target** or **sleepless_interact**. It allows officers to securely create, access, manage, clear, and delete evidence stashes tied to individuals or cases.
 
 ## 🚀 Features
 
-- 📁 Create evidence lockers with a person's name.
+- 📁 Create evidence lockers with any custom name (e.g. suspect name).
 - 🔍 Search for an existing locker and access stored items.
-- 📜 View all created lockers and select which one to open.
-- 👁️ Target with either ox_target or sleepless_interact https://github.com/Sleepless-Development/sleepless_interact // You can also add or edit to your personal target script!
-- 🗑️ Delete created lockers or just clear them if you want to keep the stash itself
-- 🎯 Secure system with job-based restrictions.
-- 🔥 Optimized **ox_target** & **sleepless_intercat** zone handling for better performance.
-- 🌍 Multi-language support (English & Swedish included).
+- 📜 View all lockers in a specific station and open them.
+- 🗑️ Clear lockers (delete contents) or permanently delete lockers.
+- ⚖️ Grade-based restrictions for clearing and deleting lockers (`clearRank` / `deleteRank`).
+- 👁️ Target system support for [ox_target](https://overextended.dev/ox_target) or [sleepless_interact](https://github.com/Sleepless-Development/sleepless_interact).
+- 🎨 Switchable UI: supports `ox_lib` or `Lation UI` for all menus, alerts, and inputs.
+- 🔔 Notifier support: `ox_lib`, `okokNotify`, or `Lation UI` notifications.
+- 📦 Fully supports both `ox_inventory` and `bb_inventory`.
+- 🧹 Automatic cleanup from `bb_containers` if using `bb_inventory`.
+- 🧠 Optimized resmon, dynamic zone spawning only when players are nearby.
+- 🌐 Localized out of the box: English & Swedish included.
+- 🧩 Version checker included (GitHub integration).
 
-## 📂 Installation
+---
 
-1. Download or clone this repository into your `resources` folder.
-2. Ensure all dependencies are installed:
-3. Run the SQL
+## ⚙️ Configuration
 
-   - [ox_inventory](https://overextended.dev/ox_inventory/)
-   - [ox_lib](https://overextended.dev/ox_lib/)
-   - [ox_target](https://overextended.dev/ox_target/) ---Optional
-   - [qbx_core](https://docs.qbox.re/)
-   - [oxmysql](https://overextended.dev/oxmysql/)
-   - [sleepless](https://github.com/Sleepless-Development/sleepless_interact) --- Optional
+Here is an example `config.lua`:
 
-4. Add the resource to your **server.cfg**:
-   ```ini
-   ensure dg-evidencelockers
-   ```
+```lua
+Config = {}
+
+Config.Interact = "sleepless" -- 'ox_target' or 'sleepless'
+Config.Notify = "lation" -- 'ox', 'okok', or 'lation'
+Config.NotifyTitle = "Evidence Locker"
+Config.NotifyIcon = "fa-solid fa-archive"
+Config.NotifyPosition = "center-right"
+Config.NotifyDuration = 5000 -- in ms
+
+Config.UseLationUi = true -- Enables Lation UI menus/dialogs
+Config.UseBbInv = true -- Enables bb_inventory deletion support
+
+Config.EvidenceLockers = {
+  ["VinewoodPoliceDep"] = {
+    coords = vector3(605.60, 7.80, 75.04),
+    jobs = { "police", "fib" },
+    clearRank = 0,
+    deleteRank = 0,
+    stashWeight = 500000,
+    stashSlots = 20,
+  },
+  ["Mrpd"] = {
+    coords = vector3(604.75, 5.55, 75.04),
+    jobs = { "ambulance", "fib" },
+    clearRank = 0,
+    deleteRank = 0,
+    stashWeight = 500000,
+    stashSlots = 20,
+  }
+}

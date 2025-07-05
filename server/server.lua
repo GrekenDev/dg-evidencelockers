@@ -10,10 +10,25 @@ local function Notify(source, data)
             duration = Config.NotifyDuration
         })
     elseif Config.Notify == "okok" then
-        TriggerClientEvent('okokNotify:Alert', source, data.title or Config.NotifyTitle or 'Evidence Locker', data.description, Config.NotifyDuration, data.type or 'info', false)
+        TriggerClientEvent('okokNotify:Alert', source,
+            data.title or Config.NotifyTitle or 'Evidence Locker',
+            data.description,
+            Config.NotifyDuration,
+            data.type or 'info',
+            false
+        )
+    elseif Config.Notify == "lation" then
+        TriggerClientEvent('dg_evidencelocker:clientNotify', source, {
+            title = data.title or Config.NotifyTitle or 'Evidence Locker',
+            message = data.description or '',
+            type = data.type or 'info',
+            icon = data.icon,
+            iconColor = data.iconColor,
+            bgColor = data.bgColor,
+            txtColor = data.txtColor
+        })
     end
 end
-
 
 CreateThread(function()
     local currentVersion = GetResourceMetadata(GetCurrentResourceName(), 'version', 0)
@@ -255,6 +270,7 @@ AddEventHandler('dg_evidencelocker:delete', function(lockerName, stashName)
     local src = source
     local job, grade = getPlayerJobAndGrade(src)
     local locker = Config.EvidenceLockers[lockerName]
+
     if not locker or not hasJob(locker.jobs, job) then
         Notify(src, { type = 'error', description = locale('no_access_job') })
         return
@@ -264,12 +280,22 @@ AddEventHandler('dg_evidencelocker:delete', function(lockerName, stashName)
         return
     end
 
-    MySQL.execute('DELETE FROM police_lockers WHERE stash_name = ? AND locker = ?', { stashName, lockerName }, function(affected)
-        if affected > 0 then
-            exports.ox_inventory:ClearInventory(stashName)
-            Notify(src, { type = 'success', description = locale('stash_deleted') })
-        else
-            Notify(src, { type = 'error', description = locale('stash_not_found') })
-        end
-    end)
+    local exists = MySQL.scalar.await('SELECT stash_name FROM police_lockers WHERE stash_name = ? AND locker = ?', { stashName, lockerName })
+    if not exists then
+        Notify(src, { type = 'error', description = locale('stash_not_found') })
+        return
+    end
+
+    MySQL.execute('DELETE FROM police_lockers WHERE stash_name = ? AND locker = ?', { stashName, lockerName })
+
+    if Config.UseBbInv then
+
+        MySQL.execute('DELETE FROM bb_containers WHERE name = ?', { stashName })
+    else
+        exports.ox_inventory:ClearInventory(stashName)
+    end
+
+    Notify(src, { type = 'success', description = locale('stash_deleted') })
 end)
+
+
