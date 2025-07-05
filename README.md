@@ -10,7 +10,7 @@
 - 🗑️ Clear lockers (delete contents) or permanently delete lockers.
 - ⚖️ Grade-based restrictions for clearing and deleting lockers (`clearRank` / `deleteRank`).
 - 👁️ Target system support for [ox_target](https://overextended.dev/ox_target) or [sleepless_interact](https://github.com/Sleepless-Development/sleepless_interact).
-- 🎨 Switchable UI: supports `ox_lib` or `Lation UI` for all menus, alerts, and inputs.
+- 🎨 Switchable UI: supports `ox_lib` or `Lation UI` for all menus, alerts, and inputs. --- https://lationscripts.com/product/modern-ui
 - 🔔 Notifier support: `ox_lib`, `okokNotify`, or `Lation UI` notifications.
 - 📦 Fully supports both `ox_inventory` and `bb_inventory`.
 - 🧹 Automatic cleanup from `bb_containers` if using `bb_inventory`.
