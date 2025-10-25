@@ -1,46 +1,16 @@
 lib.locale()
 
-
-local function Notify(source, data)
-    if Config.Notify == "ox" then
-        TriggerClientEvent('ox_lib:notify', source, {
-            type = data.type or 'info',
-            description = data.description,
-            position = Config.NotifyPosition,
-            duration = Config.NotifyDuration
-        })
-    elseif Config.Notify == "okok" then
-        TriggerClientEvent('okokNotify:Alert', source,
-            data.title or Config.NotifyTitle or 'Evidence Locker',
-            data.description,
-            Config.NotifyDuration,
-            data.type or 'info',
-            false
-        )
-    elseif Config.Notify == "lation" then
-        TriggerClientEvent('dg_evidencelocker:clientNotify', source, {
-            title = data.title or Config.NotifyTitle or 'Evidence Locker',
-            message = data.description or '',
-            type = data.type or 'info',
-            icon = data.icon,
-            iconColor = data.iconColor,
-            bgColor = data.bgColor,
-            txtColor = data.txtColor
-        })
-    end
-end
+local currentVersion = '1.0.6'
+local versionURL = 'https://raw.githubusercontent.com/GrekenDev/dg-evidencelockers/main/version.txt'
 
 CreateThread(function()
-    local currentVersion = GetResourceMetadata(GetCurrentResourceName(), 'version', 0)
-    local repo = 'GrekenDev/dg-evidencelockers'
-    print('^2[DG-EvidenceLockers] Checking version: Current = ' .. (currentVersion or 'nil') .. '^0')
-    lib.checkDependency(repo, currentVersion, function(data)
-        if not data then
+    PerformHttpRequest(versionURL, function(status, response, _)
+        if not response or status ~= 200 then
             print('^1[DG-EvidenceLockers] Version check failed. Could not reach version server.^0')
             return
         end
-        print('^2[DG-EvidenceLockers] Version data received: ' .. json.encode(data) .. '^0')
-        local latestVersion = data.version
+
+        local latestVersion = response:gsub('%s+', '')
         if latestVersion ~= currentVersion then
             print('^3[DG-EvidenceLockers] A new version is available: ^2' .. latestVersion .. '^3 (You are running: ^1' .. currentVersion .. '^3)')
             print('^3Download the latest version here: https://github.com/GrekenDev/dg-evidencelockers^0')
@@ -48,7 +18,6 @@ CreateThread(function()
             print('^2[DG-EvidenceLockers] You are running the latest version (' .. currentVersion .. ').^0')
         end
     end)
-    Wait(0)
 end)
 
 AddEventHandler('onResourceStart', function(resourceName)
@@ -97,31 +66,31 @@ AddEventHandler('dg_evidencelocker:create', function(lockerName, name)
     local job, grade = getPlayerJobAndGrade(src)
     local locker = Config.EvidenceLockers[lockerName]
     if not locker or not hasJob(locker.jobs, job) then
-        Notify(src, { type = 'error', description = locale('no_access_job') })
+        TriggerClientEvent('ox_lib:notify', src, { type = 'error', description = locale('no_access_job') })
         return
     end
 
     local stashName = generateStashName(name)
 
     if playerCooldowns[src] and (os.time() - playerCooldowns[src]) < 10 then
-        Notify(src, { type = 'error', description = locale('stash_wait') })
+        TriggerClientEvent('ox_lib:notify', src, { type = 'error', description = locale('stash_wait') })
         return
     end
 
     playerCooldowns[src] = os.time()
 
     if #stashName < 5 or #stashName > 50 then
-        Notify(src, { type = 'error', description = locale('invalid_stash_name') })
+        TriggerClientEvent('ox_lib:notify', src, { type = 'error', description = locale('invalid_stash_name') })
         return
     end
 
     MySQL.scalar('SELECT stash_name FROM police_lockers WHERE stash_name = ?', { stashName }, function(result)
         if result then
-            Notify(src, { type = 'error', description = locale('stash_exists') })
+            TriggerClientEvent('ox_lib:notify', src, { type = 'error', description = locale('stash_exists') })
         else
             MySQL.insert('INSERT INTO police_lockers (name, stash_name, locker) VALUES (?, ?, ?)', { name, stashName, lockerName }, function()
                 exports.ox_inventory:RegisterStash(stashName, name, locker.stashSlots, locker.stashWeight, false)
-                Notify(src, { type = 'success', description = locale('stash_created') .. ' ' .. name })
+                TriggerClientEvent('ox_lib:notify', src, { type = 'success', description = locale('stash_created') .. ' ' .. name })
             end)
         end
     end)
@@ -133,7 +102,7 @@ AddEventHandler('dg_evidencelocker:search', function(lockerName, name)
     local job, grade = getPlayerJobAndGrade(src)
     local locker = Config.EvidenceLockers[lockerName]
     if not locker or not hasJob(locker.jobs, job) then
-        Notify(src, { type = 'error', description = locale('no_access_job') })
+        TriggerClientEvent('ox_lib:notify', src, { type = 'error', description = locale('no_access_job') })
         return
     end
 
@@ -143,7 +112,7 @@ AddEventHandler('dg_evidencelocker:search', function(lockerName, name)
         if result then
             TriggerClientEvent('ox_inventory:openInventory', src, 'stash', stashName)
         else
-            Notify(src, { type = 'error', description = locale('stash_not_found') })
+            TriggerClientEvent('ox_lib:notify', src, { type = 'error', description = locale('stash_not_found') })
         end
     end)
 end)
@@ -154,7 +123,7 @@ AddEventHandler('dg_evidencelocker:showAll', function(lockerName)
     local job, grade = getPlayerJobAndGrade(src)
     local locker = Config.EvidenceLockers[lockerName]
     if not locker or not hasJob(locker.jobs, job) then
-        Notify(src, { type = 'error', description = locale('no_access_job') })
+        TriggerClientEvent('ox_lib:notify', src, { type = 'error', description = locale('no_access_job') })
         return
     end
 
@@ -162,7 +131,7 @@ AddEventHandler('dg_evidencelocker:showAll', function(lockerName)
         if #results > 0 then
             TriggerClientEvent('dg_evidencelocker:openMenu', src, lockerName, results)
         else
-            Notify(src, { type = 'info', description = locale('no_stashes') })
+            TriggerClientEvent('ox_lib:notify', src, { type = 'info', description = locale('no_stashes') })
         end
     end)
 end)
@@ -173,11 +142,11 @@ AddEventHandler('dg_evidencelocker:clearMenu', function(lockerName)
     local job, grade = getPlayerJobAndGrade(src)
     local locker = Config.EvidenceLockers[lockerName]
     if not locker or not hasJob(locker.jobs, job) then
-        Notify(src, { type = 'error', description = locale('no_access_job') })
+        TriggerClientEvent('ox_lib:notify', src, { type = 'error', description = locale('no_access_job') })
         return
     end
     if grade < locker.clearRank then
-        Notify(src, { type = 'error', description = locale('no_access_clear') })
+        TriggerClientEvent('ox_lib:notify', src, { type = 'error', description = locale('no_access_clear') })
         return
     end
 
@@ -185,7 +154,7 @@ AddEventHandler('dg_evidencelocker:clearMenu', function(lockerName)
         if #results > 0 then
             TriggerClientEvent('dg_evidencelocker:openClearMenu', src, lockerName, results)
         else
-            Notify(src, { type = 'info', description = locale('no_stashes') })
+            TriggerClientEvent('ox_lib:notify', src, { type = 'info', description = locale('no_stashes') })
         end
     end)
 end)
@@ -196,11 +165,11 @@ AddEventHandler('dg_evidencelocker:confirmClear', function(lockerName, stashName
     local job, grade = getPlayerJobAndGrade(src)
     local locker = Config.EvidenceLockers[lockerName]
     if not locker or not hasJob(locker.jobs, job) then
-        Notify(src, { type = 'error', description = locale('no_access_job') })
+        TriggerClientEvent('ox_lib:notify', src, { type = 'error', description = locale('no_access_job') })
         return
     end
     if grade < locker.clearRank then
-        Notify(src, { type = 'error', description = locale('no_access_clear') })
+        TriggerClientEvent('ox_lib:notify', src, { type = 'error', description = locale('no_access_clear') })
         return
     end
 
@@ -213,17 +182,18 @@ AddEventHandler('dg_evidencelocker:clear', function(lockerName, stashName)
     local job, grade = getPlayerJobAndGrade(src)
     local locker = Config.EvidenceLockers[lockerName]
     if not locker or not hasJob(locker.jobs, job) then
-        Notify(src, { type = 'error', description = locale('no_access_job') })
+        TriggerClientEvent('ox_lib:notify', src, { type = 'error', description = locale('no_access_job') })
         return
     end
     if grade < locker.clearRank then
-        Notify(src, { type = 'error', description = locale('no_access_clear') })
+        TriggerClientEvent('ox_lib:notify', src, { type = 'error', description = locale('no_access_clear') })
         return
     end
 
     exports.ox_inventory:ClearInventory(stashName)
-    Notify(src, { type = 'success', description = locale('stash_cleared') })
+    TriggerClientEvent('ox_lib:notify', src, { type = 'success', description = locale('stash_cleared') })
 end)
+
 
 RegisterNetEvent('dg_evidencelocker:deleteMenu')
 AddEventHandler('dg_evidencelocker:deleteMenu', function(lockerName)
@@ -231,11 +201,11 @@ AddEventHandler('dg_evidencelocker:deleteMenu', function(lockerName)
     local job, grade = getPlayerJobAndGrade(src)
     local locker = Config.EvidenceLockers[lockerName]
     if not locker or not hasJob(locker.jobs, job) then
-        Notify(src, { type = 'error', description = locale('no_access_job') })
+        TriggerClientEvent('ox_lib:notify', src, { type = 'error', description = locale('no_access_job') })
         return
     end
     if grade < locker.deleteRank then
-        Notify(src, { type = 'error', description = locale('no_access_delete') })
+        TriggerClientEvent('ox_lib:notify', src, { type = 'error', description = locale('no_access_delete') })
         return
     end
 
@@ -243,7 +213,7 @@ AddEventHandler('dg_evidencelocker:deleteMenu', function(lockerName)
         if #results > 0 then
             TriggerClientEvent('dg_evidencelocker:openDeleteMenu', src, lockerName, results)
         else
-            Notify(src, { type = 'info', description = locale('no_stashes') })
+            TriggerClientEvent('ox_lib:notify', src, { type = 'info', description = locale('no_stashes') })
         end
     end)
 end)
@@ -254,11 +224,11 @@ AddEventHandler('dg_evidencelocker:confirmDelete', function(lockerName, stashNam
     local job, grade = getPlayerJobAndGrade(src)
     local locker = Config.EvidenceLockers[lockerName]
     if not locker or not hasJob(locker.jobs, job) then
-        Notify(src, { type = 'error', description = locale('no_access_job') })
+        TriggerClientEvent('ox_lib:notify', src, { type = 'error', description = locale('no_access_job') })
         return
     end
     if grade < locker.deleteRank then
-        Notify(src, { type = 'error', description = locale('no_access_delete') })
+        TriggerClientEvent('ox_lib:notify', src, { type = 'error', description = locale('no_access_delete') })
         return
     end
 
@@ -270,32 +240,21 @@ AddEventHandler('dg_evidencelocker:delete', function(lockerName, stashName)
     local src = source
     local job, grade = getPlayerJobAndGrade(src)
     local locker = Config.EvidenceLockers[lockerName]
-
     if not locker or not hasJob(locker.jobs, job) then
-        Notify(src, { type = 'error', description = locale('no_access_job') })
+        TriggerClientEvent('ox_lib:notify', src, { type = 'error', description = locale('no_access_job') })
         return
     end
     if grade < locker.deleteRank then
-        Notify(src, { type = 'error', description = locale('no_access_delete') })
+        TriggerClientEvent('ox_lib:notify', src, { type = 'error', description = locale('no_access_delete') })
         return
     end
 
-    local exists = MySQL.scalar.await('SELECT stash_name FROM police_lockers WHERE stash_name = ? AND locker = ?', { stashName, lockerName })
-    if not exists then
-        Notify(src, { type = 'error', description = locale('stash_not_found') })
-        return
-    end
-
-    MySQL.execute('DELETE FROM police_lockers WHERE stash_name = ? AND locker = ?', { stashName, lockerName })
-
-    if Config.UseBbInv then
-
-        MySQL.execute('DELETE FROM bb_containers WHERE name = ?', { stashName })
-    else
-        exports.ox_inventory:ClearInventory(stashName)
-    end
-
-    Notify(src, { type = 'success', description = locale('stash_deleted') })
+    MySQL.execute('DELETE FROM police_lockers WHERE stash_name = ? AND locker = ?', { stashName, lockerName }, function(affected)
+        if affected > 0 then
+            exports.ox_inventory:ClearInventory(stashName)
+            TriggerClientEvent('ox_lib:notify', src, { type = 'success', description = locale('stash_deleted') })
+        else
+            TriggerClientEvent('ox_lib:notify', src, { type = 'error', description = locale('stash_not_found') })
+        end
+    end)
 end)
-
-

@@ -33,6 +33,5 @@
     "stash_deleted_failed": "Failed to delete the locker. Please try again or check permissions.",
     "back": "Back",
     "cancel": "Cancel",
-    "confirm": "Confirm",
-    "submitText": "Confirm"
+    "confirm": "Confirm"
 }
